@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Ascisim</title>
+
+  <script src="scripts/ascisim.js"></script>
+  <script src="scripts/screen.js"></script>
+  <script src="scripts/display.js"></script>
+  <script src="scripts/protocol.js"></script>
+  <script src="scripts/textconsole.js"></script>
+  <script src="scripts/loginscreen.js"></script>
+  <script src="scripts/game.js"></script>
+</head>
+<body>
+  <canvas id="asc"></canvas>
+</body>
+
+<script>
+  
+  var game = new ASCISIM.Game('#asc');
+  game.console.line("Started up...");
+  game.connect();
+
+</script>
+</html>
