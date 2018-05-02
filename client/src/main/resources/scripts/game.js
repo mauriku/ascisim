@@ -20,7 +20,8 @@ ASCISIM.Game = function(canvasId) {
   };
 
   this.handlers = {
-    '2': new ASCISIM.HandshakeResponseHandler()
+    '1': new ASCISIM.HandshakeResponseHandler(),
+    '2': new ASCISIM.LoginResponseHandler()
   };
   
   requestAnimationFrame(this.render.bind(this));
@@ -47,7 +48,7 @@ ASCISIM.Game.prototype.connect = function () {
   this.socket.onopen = function (event) {
     this.console.line("Successfully connected to " + this.getServerUrl() + ".");
     this.console.line("Sending initial handshake.");
-    this.socket.send(new Uint8Array([0x01]));
+    this.sendBinary(0x01);
     game.render();
   }.bind(this);
 
@@ -87,6 +88,25 @@ ASCISIM.Game.prototype.render = function() {
   if (this.focused)
     this.focused.draw();
   requestAnimationFrame(this.display.render.bind(this.display));
+};
+
+ASCISIM.Game.prototype.sendBinary = function(control, data) {
+  var bytes = [control];
+  if (data) {
+    if (data instanceof Array) {
+      for (var i = 0; i < data.length; i++)
+        if (data[i] instanceof Number && data[i] > 0 && data[i] < 256)
+          bytes.push(data[i]);
+    }
+    else if (typeof data === 'string') {
+      var u8ar = new TextEncoder().encode(data);
+      console.log(u8ar);
+      for (var k = 0; k < u8ar.length; k++)
+        bytes.push(u8ar[k]);
+    }
+  }
+
+  this.socket.send(new Uint8Array(bytes));
 };
 
 

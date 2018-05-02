@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public interface MetaobjectMetadata {
 
-  Object getAuthor();
+  WorldObject getAuthor();
   LocalDateTime getDateCreated();
   String getDescription();
 

@@ -1,5 +1,5 @@
 package cz.mauriku.ascisim.server.objects;
 
-public interface Object {
+public interface WorldObject {
   String getId();
 }

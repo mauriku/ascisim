@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public class ClientHandshakeHandler implements MessageHandler {
 
-  Logger LOG = LoggerFactory.getLogger(ClientHandshakeHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClientHandshakeHandler.class);
 
   @Override
   public void handle(AscisimServerProtocolHandler protocol, Channel channel, BinaryWebSocketFrame frame) {
@@ -21,7 +21,7 @@ public class ClientHandshakeHandler implements MessageHandler {
 
       ByteReplyBuilder reply = new ByteReplyBuilder()
           .begin(64)
-          .add(ControlByte.SERVER_HANDSHAKE_RESPONSE)
+          .add(ControlByte.HANDSHAKE)
           .add(true) // server is open for client connections
           .add(140)  // screen width
           .add(45)   // screen height

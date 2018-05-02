@@ -49,6 +49,10 @@ ASCISIM.LoginScreen.prototype.onKeyDown = function (event) {
       this.state = this.STATES.READY;
       this.game.console.mode = this.game.console.MODES.NORMAL;
       this.game.console.line("Sending login request.");
+
+      this.game.sendBinary(0x02, this.username + "/" + this.password);
+      this.username = "";
+      this.password = "";
     }
   }
 };

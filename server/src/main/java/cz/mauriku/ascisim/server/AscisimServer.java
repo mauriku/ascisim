@@ -1,7 +1,9 @@
 package cz.mauriku.ascisim.server;
 
 
+import cz.mauriku.ascisim.server.objects.client.PlayerAccount;
 import cz.mauriku.ascisim.server.protocol.AscisimServerProtocolHandler;
+import cz.mauriku.ascisim.server.services.PlayerAccountService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -12,37 +14,62 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import org.apache.ignite.Ignite;
+import org.apache.ignite.IgniteCache;
+import org.apache.ignite.Ignition;
+import org.apache.ignite.configuration.DataRegionConfiguration;
+import org.apache.ignite.configuration.DataStorageConfiguration;
+import org.apache.ignite.configuration.IgniteConfiguration;
+import org.apache.ignite.logger.slf4j.Slf4jLogger;
 
 import java.net.InetSocketAddress;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class AscisimServer {
 
-  // https://www.gridgain.com/resources/blog/we-use-apache-ignite-in-everyday-life
-  //https://leanjava.co/2018/03/14/getting-started-with-netty-building-a-websocket-broadcast-server/
+  private Ignite ignite;
+  private ServerBootstrap server;
+
+  private void initIgnite(AscisimServerOptions options) {
+    IgniteConfiguration cfg = new IgniteConfiguration();
+    cfg.setGridLogger(new Slf4jLogger());
+    cfg.setClientMode(false);
+    cfg.setIgniteHome(options.getDataDirPath() + "/db");
+
+    DataStorageConfiguration dataCfg = new DataStorageConfiguration();
+    dataCfg.setDefaultDataRegionConfiguration(new DataRegionConfiguration().setPersistenceEnabled(true));
+    cfg.setDataStorageConfiguration(dataCfg);
+
+    ignite = Ignition.start(cfg);
+    ignite.cluster().active(true);
+  }
+
+  private void initWebSocketServer(AscisimServerOptions options) throws InterruptedException {
+    server = new ServerBootstrap();
+    server.group(new NioEventLoopGroup(), new NioEventLoopGroup())
+        .channel(NioServerSocketChannel.class)
+        .localAddress(new InetSocketAddress(options.getPort()))
+        .childHandler(new ChannelInitializer<SocketChannel>() {
+          @Override
+          public void initChannel(final SocketChannel ch) throws Exception {
+            ch.pipeline().addLast(
+                new HttpRequestDecoder(),
+                new HttpObjectAggregator(65536),
+                new HttpResponseEncoder(),
+                new WebSocketServerProtocolHandler("/", null, true),
+                new AscisimServerProtocolHandler());
+          }
+        });
+    final Channel ch = server.bind().sync().channel();
+    ch.closeFuture().sync();
+  }
 
   public static void main(String[] args) throws InterruptedException {
-    final ServerBootstrap sb = new ServerBootstrap();
-    try {
-      sb.group(new NioEventLoopGroup(), new NioEventLoopGroup())
-          .channel(NioServerSocketChannel.class)
-          .localAddress(new InetSocketAddress(7070))
-          .childHandler(new ChannelInitializer<SocketChannel>() {
-            @Override
-            public void initChannel(final SocketChannel ch) throws Exception {
-              ch.pipeline().addLast(
-                  new HttpRequestDecoder(),
-                  new HttpObjectAggregator(65536),
-                  new HttpResponseEncoder(),
-                  new WebSocketServerProtocolHandler("/", null, true),
-                  new AscisimServerProtocolHandler());
-            }
-          });
+    AscisimServerOptions options = AscisimServerOptions.fromArguments(args);
 
-      final Channel ch = sb.bind().sync().channel();
-
-      ch.closeFuture().sync();
-    } finally {
-      //
-    }
+    AscisimServer server = new AscisimServer();
+    server.initIgnite(options);
+    server.initWebSocketServer(options);
   }
 }

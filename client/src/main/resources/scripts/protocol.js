@@ -31,3 +31,8 @@ ASCISIM.HandshakeResponseHandler.prototype.handle = function (game, data) {
     game.console.line("# Server is currently closed. Try later.");
   }
 };
+
+ASCISIM.LoginResponseHandler = function() {
+  ASCISIM.ResponseHandler.call(this);
+};
+ASCISIM.LoginResponseHandler.prototype = Object.create(ASCISIM.ResponseHandler.prototype);
