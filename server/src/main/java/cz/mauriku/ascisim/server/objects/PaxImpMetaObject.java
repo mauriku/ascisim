@@ -3,10 +3,7 @@ package cz.mauriku.ascisim.server.objects;
 import cz.mauriku.ascisim.server.objects.client.PlayerAccount;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class PaxImpMetaObject {
   
@@ -15,8 +12,8 @@ public class PaxImpMetaObject {
   private PaxImpObjectType type;
   private Map<String, Object> property;
   private Map<String, String> actionCode;
-  private List<PaxImpMetaObjectLog> log;
   private String authorAccountId;
+  private transient List<PaxImpMetaObjectLog> log;
 
   private transient PlayerAccount authorAccount;
 
@@ -24,6 +21,7 @@ public class PaxImpMetaObject {
     id = "META_" + UUID.randomUUID().toString();
     property = new HashMap<>();
     actionCode = new HashMap<>();
+    log = new ArrayList<>();
   }
 
   public PaxImpObject createNewObject() {
