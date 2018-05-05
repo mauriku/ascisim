@@ -10,7 +10,11 @@ public class PlayerAccount {
   private boolean banned;
   private Instant createdDate;
   private Instant lastLoginDate;
-  
+
+  public String getId() {
+    return getEmail();
+  }
+
   public String getEmail() {
     return email;
   }

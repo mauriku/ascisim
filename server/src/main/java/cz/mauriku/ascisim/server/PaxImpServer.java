@@ -1,11 +1,9 @@
 package cz.mauriku.ascisim.server;
 
 
-import cz.mauriku.ascisim.server.objects.client.PlayerAccount;
-import cz.mauriku.ascisim.server.protocol.AscisimServerProtocolHandler;
-import cz.mauriku.ascisim.server.services.PlayerAccountService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -15,7 +13,6 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import org.apache.ignite.Ignite;
-import org.apache.ignite.IgniteCache;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.DataRegionConfiguration;
 import org.apache.ignite.configuration.DataStorageConfiguration;
@@ -23,15 +20,18 @@ import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
 
 import java.net.InetSocketAddress;
-import java.nio.file.Paths;
-import java.util.*;
 
-public class AscisimServer {
+public class PaxImpServer {
 
   private Ignite ignite;
   private ServerBootstrap server;
+  private final ServerOptions options;
 
-  private void initIgnite(AscisimServerOptions options) {
+  public PaxImpServer(ServerOptions options) {
+    this.options = options;
+  }
+
+  public void initIgnite() {
     IgniteConfiguration cfg = new IgniteConfiguration();
     cfg.setGridLogger(new Slf4jLogger());
     cfg.setClientMode(false);
@@ -45,7 +45,7 @@ public class AscisimServer {
     ignite.cluster().active(true);
   }
 
-  private void initWebSocketServer(AscisimServerOptions options) throws InterruptedException {
+  public void initWebSocketServer(ChannelHandler handler) throws InterruptedException {
     server = new ServerBootstrap();
     server.group(new NioEventLoopGroup(), new NioEventLoopGroup())
         .channel(NioServerSocketChannel.class)
@@ -58,18 +58,18 @@ public class AscisimServer {
                 new HttpObjectAggregator(65536),
                 new HttpResponseEncoder(),
                 new WebSocketServerProtocolHandler("/", null, true),
-                new AscisimServerProtocolHandler());
+                handler);
           }
         });
     final Channel ch = server.bind().sync().channel();
     ch.closeFuture().sync();
   }
 
-  public static void main(String[] args) throws InterruptedException {
-    AscisimServerOptions options = AscisimServerOptions.fromArguments(args);
+  public Ignite getIgnite() {
+    return ignite;
+  }
 
-    AscisimServer server = new AscisimServer();
-    server.initIgnite(options);
-    server.initWebSocketServer(options);
+  public ServerBootstrap getServer() {
+    return server;
   }
 }

@@ -7,9 +7,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class AscisimServerOptions {
+public class ServerOptions {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AscisimServerOptions.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServerOptions.class);
 
   public final int DEFAULT_PORT = 7077;
   public final String DEFAULT_DATA_DIR = Paths.get("./data").toAbsolutePath().toString();
@@ -17,8 +17,8 @@ public class AscisimServerOptions {
   private Integer port;
   private String dataDirPath;
 
-  public static AscisimServerOptions fromArguments(String[] args) {
-    AscisimServerOptions opts = new AscisimServerOptions();
+  public static ServerOptions fromArguments(String[] args) {
+    ServerOptions opts = new ServerOptions();
     Iterator<String> argumentsIterator = Arrays.asList(args).iterator();
 
     while(argumentsIterator.hasNext()) {

@@ -2,8 +2,6 @@ package cz.mauriku.ascisim.server.protocol;
 
 
 import cz.mauriku.ascisim.server.objects.client.PlayerClient;
-import cz.mauriku.ascisim.server.protocol.handshake.ClientHandshakeHandler;
-import cz.mauriku.ascisim.server.protocol.handshake.ClientLoginHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -19,12 +17,20 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AscisimServerProtocolHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+public class PaxImpProtocolHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AscisimServerProtocolHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PaxImpProtocolHandler.class);
 
   private static final AttributeKey<PlayerClient> CLIENT_ATTR = AttributeKey.newInstance("client");
   private static final ChannelGroup CHANNEL_GROUP_ALL = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
+  private final Map<Byte, MessageHandler> handlers;
+
+  public PaxImpProtocolHandler(MessageHandler ... handlers) {
+    this.handlers = new HashMap<>();
+    for (MessageHandler handler : handlers)
+      this.handlers.put(handler.getHandledByte().opcode, handler);
+  }
 
   @Override
   protected void channelRead0(ChannelHandlerContext context, WebSocketFrame frame) throws Exception {
@@ -34,13 +40,13 @@ public class AscisimServerProtocolHandler extends SimpleChannelInboundHandler<We
 
       if (binFrame.content().readableBytes() > 0) {
         byte control = binFrame.content().readByte();
-        if (!HANDLERS.containsKey(control)) {
+        if (!handlers.containsKey(control)) {
           LOG.info("Disconnecting client [" + client.getId() + "]: invalid OPCODE received.");
           context.disconnect();
         }
 
         LOG.debug("Received opcode [" + String.format("%02X", control) + "] from client [" + client.getId() + "]");
-        MessageHandler handler = HANDLERS.get(control);
+        MessageHandler handler = handlers.get(control);
         handler.handle(this, context.channel(), binFrame);
       }
     }
@@ -65,11 +71,4 @@ public class AscisimServerProtocolHandler extends SimpleChannelInboundHandler<We
   public static PlayerClient getClientFromChannel(Channel channel) {
     return channel.attr(CLIENT_ATTR).get();
   }
-
-  private final Map<Byte, MessageHandler> HANDLERS = new HashMap<Byte, MessageHandler>() {
-    {
-      put(ControlByte.HANDSHAKE.opcode, new ClientHandshakeHandler());
-      put(ControlByte.LOGIN.opcode, new ClientLoginHandler());
-    }
-  };
 }

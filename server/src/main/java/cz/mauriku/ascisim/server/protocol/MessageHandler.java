@@ -5,5 +5,6 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 
 public interface MessageHandler {
 
-  void handle(AscisimServerProtocolHandler protocol, Channel channel, BinaryWebSocketFrame frame);
+  ControlByte getHandledByte();
+  void handle(PaxImpProtocolHandler protocol, Channel channel, BinaryWebSocketFrame frame);
 }

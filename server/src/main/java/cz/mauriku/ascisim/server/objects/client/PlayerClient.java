@@ -1,19 +1,17 @@
 package cz.mauriku.ascisim.server.objects.client;
 
-import cz.mauriku.ascisim.server.objects.WorldObject;
-
 import java.util.UUID;
 
-public class PlayerClient implements WorldObject {
+public class PlayerClient{
 
   private String id;
-  private int authenticationToken;
+  private long authenticationToken;
+  private PlayerAccount account;
 
   public PlayerClient() {
     id = UUID.randomUUID().toString();
   }
 
-  @Override
   public String getId() {
     return id;
   }
@@ -22,11 +20,19 @@ public class PlayerClient implements WorldObject {
     this.id = id;
   }
 
-  public int getAuthenticationToken() {
+  public long getAuthenticationToken() {
     return authenticationToken;
   }
 
-  public void setAuthenticationToken(int authenticationToken) {
+  public void setAuthenticationToken(long authenticationToken) {
     this.authenticationToken = authenticationToken;
+  }
+
+  public PlayerAccount getAccount() {
+    return account;
+  }
+
+  public void setAccount(PlayerAccount account) {
+    this.account = account;
   }
 }

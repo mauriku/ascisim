@@ -1,7 +1,7 @@
 package cz.mauriku.ascisim.server.protocol.handshake;
 
 
-import cz.mauriku.ascisim.server.protocol.AscisimServerProtocolHandler;
+import cz.mauriku.ascisim.server.protocol.PaxImpProtocolHandler;
 import cz.mauriku.ascisim.server.protocol.ByteReplyBuilder;
 import cz.mauriku.ascisim.server.protocol.ControlByte;
 import cz.mauriku.ascisim.server.protocol.MessageHandler;
@@ -15,8 +15,13 @@ public class ClientHandshakeHandler implements MessageHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ClientHandshakeHandler.class);
 
   @Override
-  public void handle(AscisimServerProtocolHandler protocol, Channel channel, BinaryWebSocketFrame frame) {
-    LOG.debug("Client [" + AscisimServerProtocolHandler.getClientFromChannel(channel).getId() +
+  public ControlByte getHandledByte() {
+    return ControlByte.HANDSHAKE;
+  }
+
+  @Override
+  public void handle(PaxImpProtocolHandler protocol, Channel channel, BinaryWebSocketFrame frame) {
+    LOG.debug("Client [" + PaxImpProtocolHandler.getClientFromChannel(channel).getId() +
         "] handshake request received.");
 
       ByteReplyBuilder reply = new ByteReplyBuilder()
