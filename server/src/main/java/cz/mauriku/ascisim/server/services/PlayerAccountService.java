@@ -1,6 +1,7 @@
 package cz.mauriku.ascisim.server.services;
 
 import cz.mauriku.ascisim.server.objects.client.PlayerAccount;
+import cz.mauriku.ascisim.server.objects.client.PlayerAccountLevel;
 import cz.mauriku.ascisim.server.security.PasswordHasher;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
@@ -35,7 +36,7 @@ public class PlayerAccountService {
     this.cache = ignite.getOrCreateCache(cfg);
   }
 
-  public PlayerAccount createAccount(String email, String password) {
+  public PlayerAccount createAccount(String email, String password, PlayerAccountLevel level) {
     if (this.cache.containsKey(email))
       throw new IllegalStateException("Account [" + email + "] already exists. Not creating.");
 
@@ -46,6 +47,7 @@ public class PlayerAccountService {
       acc.setEmailVerified(false);
       acc.setBanned(false);
       acc.setCreatedDate(Instant.now());
+      acc.setLevel(level);
 
       this.cache.put(acc.getEmail(), acc);
       return acc;

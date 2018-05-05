@@ -18,6 +18,12 @@ public class PaxImpServerMain {
     PlayerAccountService playerAccountService = new PlayerAccountService(server.getIgnite());
     MetaObjectService metaObjectService = new MetaObjectService(server.getIgnite());
 
+    WorldInitialSeed worldSeed = new WorldInitialSeed(
+        playerAccountService,
+        metaObjectService
+    );
+    worldSeed.initWorld();
+
     server.initWebSocketServer(
         new PaxImpProtocolHandler(
             new ClientHandshakeHandler(),

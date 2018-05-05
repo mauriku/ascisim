@@ -10,6 +10,7 @@ public class PlayerAccount {
   private boolean banned;
   private Instant createdDate;
   private Instant lastLoginDate;
+  private PlayerAccountLevel level;
 
   public String getId() {
     return getEmail();
@@ -61,5 +62,13 @@ public class PlayerAccount {
 
   public void setLastLoginDate(Instant lastLoginDate) {
     this.lastLoginDate = lastLoginDate;
+  }
+
+  public PlayerAccountLevel getLevel() {
+    return level;
+  }
+
+  public void setLevel(PlayerAccountLevel level) {
+    this.level = level;
   }
 }
