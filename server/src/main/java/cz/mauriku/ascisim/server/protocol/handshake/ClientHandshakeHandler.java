@@ -21,8 +21,7 @@ public class ClientHandshakeHandler implements MessageHandler {
 
   @Override
   public void handle(PaxImpProtocolHandler protocol, Channel channel, BinaryWebSocketFrame frame) {
-    LOG.debug("Client [" + PaxImpProtocolHandler.getClientFromChannel(channel).getId() +
-        "] handshake request received.");
+    LOG.debug("Client handshake request received.");
 
       ByteReplyBuilder reply = new ByteReplyBuilder()
           .begin(64)

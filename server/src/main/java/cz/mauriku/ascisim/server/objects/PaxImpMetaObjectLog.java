@@ -25,6 +25,7 @@ public class PaxImpMetaObjectLog {
     this.type = type;
     this.account = account;
     this.accountId = account.getId();
+    this.logDate = Instant.now();
   }
 
   public String getId() {

@@ -9,7 +9,8 @@ ASCISIM.Game = function(canvasId) {
     title: "Connecting to server"
   });
   this.screens = {
-    'login': new ASCISIM.LoginScreen(this)
+    'login': new ASCISIM.LoginScreen(this),
+    'main': new ASCISIM.MainScreen(this)
   };
 
   this.focused = null;
@@ -100,7 +101,6 @@ ASCISIM.Game.prototype.sendBinary = function(control, data) {
     }
     else if (typeof data === 'string') {
       var u8ar = new TextEncoder().encode(data);
-      console.log(u8ar);
       for (var k = 0; k < u8ar.length; k++)
         bytes.push(u8ar[k]);
     }

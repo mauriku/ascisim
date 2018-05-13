@@ -50,11 +50,17 @@ ASCISIM.LoginScreen.prototype.onKeyDown = function (event) {
       this.game.console.mode = this.game.console.MODES.NORMAL;
       this.game.console.line("Sending login request.");
 
-      this.game.sendBinary(0x02, this.username + "/" + this.password);
-      this.username = "";
+      this.game.sendBinary(0x02, 'P' + this.username + "/" + this.password);
       this.password = "";
     }
   }
+};
+
+ASCISIM.LoginScreen.prototype.tryAgain = function() {
+  this.password = "";
+  this.state = this.STATES.PASSWORD_INPUT;
+  this.game.console.mode = this.game.console.MODES.PASSWORD;
+  this.game.console.line("Password:");
 };
 
 ASCISIM.LoginScreen.prototype.draw = function () {

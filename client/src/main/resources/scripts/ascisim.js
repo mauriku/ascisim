@@ -3,6 +3,20 @@ var ASCISIM = {
   VK_RETURN: 13
 };
 
+ASCISIM.PLAYER = {};
+
+ASCISIM.PLAYER.properties = {
+  hpCur: 0,
+  hpMax: 999,
+  epCur: 0,
+  epMax: 999,
+  level: 1,
+  xpCur: 0,
+  xpNxt: 999999,
+  name: 'Player One',
+  locationName: 'Unknown Location'
+};
+
 ASCISIM.GENERATORS = {};
 
 ASCISIM.GENERATORS.homogeneousText = function (char, length) {

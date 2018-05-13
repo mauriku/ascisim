@@ -10,6 +10,7 @@ public class PlayerAccount {
   private boolean banned;
   private Instant createdDate;
   private Instant lastLoginDate;
+  private String authenticationToken;
   private PlayerAccountLevel level;
 
   public String getId() {
@@ -70,5 +71,13 @@ public class PlayerAccount {
 
   public void setLevel(PlayerAccountLevel level) {
     this.level = level;
+  }
+
+  public String getAuthenticationToken() {
+    return authenticationToken;
+  }
+
+  public void setAuthenticationToken(String authenticationToken) {
+    this.authenticationToken = authenticationToken;
   }
 }

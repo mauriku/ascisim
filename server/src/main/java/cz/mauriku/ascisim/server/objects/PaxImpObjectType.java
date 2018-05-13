@@ -4,7 +4,8 @@ public enum PaxImpObjectType {
   UNIVERSE("UNV"),
   SECTOR ("SEC"),
   CORPUSCULE("CRP"),
-  LOCATION ("LOC");
+  LOCATION ("LOC"),
+  CHARACTER ("PCH");
 
   String idPrefix;
 

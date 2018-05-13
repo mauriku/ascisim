@@ -7,8 +7,14 @@ import org.apache.ignite.IgniteCache;
 import org.apache.ignite.cache.CacheAtomicityMode;
 import org.apache.ignite.cache.CacheMode;
 import org.apache.ignite.cache.CacheWriteSynchronizationMode;
+import org.apache.ignite.cache.query.QueryCursor;
+import org.apache.ignite.cache.query.ScanQuery;
+import org.apache.ignite.cache.query.SqlQuery;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.transactions.Transaction;
+
+import javax.cache.Cache;
+import java.util.ArrayList;
 
 public class MetaObjectService {
   private final Ignite ignite;
@@ -36,20 +42,50 @@ public class MetaObjectService {
   }
 
   public PaxImpMetaObject createMetaObject(PlayerAccount author, PaxImpObjectType type, String name) {
-    PaxImpMetaObject metaobj = new PaxImpMetaObject();
-    metaobj.setType(type);
-    metaobj.setMetaObjectProperty(PaxImpObject.NAME, name);
-    metaobj.setAuthorAccount(author);
+    PaxImpMetaObject metaObject = new PaxImpMetaObject();
+    metaObject.setType(type);
+    metaObject.setMetaObjectProperty(PaxImpObject.NAME, name);
+    metaObject.setAuthorAccount(author);
 
-    PaxImpMetaObjectLog log = new PaxImpMetaObjectLog(metaobj.getId(), PaxImpMetaObjectLogType.CREATED, author);
-    metaobj.getLog().add(log);
+    PaxImpMetaObjectLog log = new PaxImpMetaObjectLog(metaObject.getId(), PaxImpMetaObjectLogType.CREATED, author);
+    metaObject.getLog().add(log);
 
     try (Transaction tx = ignite.transactions().txStart()) {
       this.logCache.put(log.getId(), log);
-      this.objectCache.put(metaobj.getId(), metaobj);
+      this.objectCache.put(metaObject.getId(), metaObject);
       tx.commit();
     }
 
-    return metaobj;
+    return metaObject;
+  }
+
+  public PaxImpMetaObject updateMetaObject(PlayerAccount author, PaxImpMetaObject metaObject) {
+    PaxImpMetaObjectLog log = new PaxImpMetaObjectLog(metaObject.getId(), PaxImpMetaObjectLogType.UPDATED, author);
+    metaObject.getLog().add(log);
+
+    try (Transaction tx = ignite.transactions().txStart()) {
+      this.logCache.put(log.getId(), log);
+      this.objectCache.replace(metaObject.getId(), metaObject);
+      tx.commit();
+    }
+
+    return metaObject;
+  }
+
+  public PaxImpMetaObject getMetaObject(String id, boolean includeLog) {
+    PaxImpMetaObject metaObject = this.objectCache.get(id);
+
+    if (metaObject != null && includeLog) {
+      if (metaObject.getLog() == null)
+        metaObject.setLog(new ArrayList<>());
+
+      ScanQuery<String, PaxImpMetaObjectLog> q = new ScanQuery<>((k, p) -> p.getMetaObjectId().equals(metaObject.getId()));
+      try (QueryCursor<Cache.Entry<String, PaxImpMetaObjectLog>> cursor = this.logCache.query(q)) {
+        for (Cache.Entry<String, PaxImpMetaObjectLog> entry : cursor)
+          metaObject.getLog().add(entry.getValue());
+      }
+    }
+
+    return metaObject;
   }
 }

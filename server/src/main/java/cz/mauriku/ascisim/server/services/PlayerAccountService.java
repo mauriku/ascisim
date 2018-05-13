@@ -8,8 +8,6 @@ import org.apache.ignite.IgniteCache;
 import org.apache.ignite.cache.CacheAtomicityMode;
 import org.apache.ignite.cache.CacheMode;
 import org.apache.ignite.cache.CacheWriteSynchronizationMode;
-import org.apache.ignite.cache.query.Query;
-import org.apache.ignite.cache.query.SqlQuery;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.transactions.Transaction;
 
@@ -60,7 +58,7 @@ public class PlayerAccountService {
     return this.cache.get(email);
   }
 
-  public boolean authenticateAccount(String email, String password) {
+  public boolean authenticateAccountUsingPassword(String email, String password) {
     PlayerAccount acc = findAccount(email);
     if (acc == null)
       return false;
@@ -72,8 +70,13 @@ public class PlayerAccountService {
     }
   }
 
+  public boolean authenticateAccountUsingToken(String email, String token) {
+    // TODO
+    return true;
+  }
+
   public boolean changePassword(String email, String oldPassword, String newPassword) {
-    boolean authenticated = authenticateAccount(email, oldPassword);
+    boolean authenticated = authenticateAccountUsingPassword(email, oldPassword);
     if (authenticated) {
       try (Transaction tx = ignite.transactions().txStart()) {
         PlayerAccount acc = findAccount(email);
@@ -84,5 +87,12 @@ public class PlayerAccountService {
       }
     } else
       return false;
+  }
+
+  public PlayerAccount updateAccount(PlayerAccount account) {
+    try (Transaction tx = ignite.transactions().txStart()) {
+      cache.replace(account.getEmail(), account);
+      return account;
+    }
   }
 }

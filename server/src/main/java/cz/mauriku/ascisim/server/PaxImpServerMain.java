@@ -22,7 +22,8 @@ public class PaxImpServerMain {
         playerAccountService,
         metaObjectService
     );
-    worldSeed.initWorld();
+
+    //worldSeed.initWorld();
 
     server.initWebSocketServer(
         new PaxImpProtocolHandler(

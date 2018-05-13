@@ -11,7 +11,13 @@ ASCISIM.Display = function (canvas, options) {
     fontFamily: "monospace",
     fontStyle: "",
     fg: "#ccc",
-    bg: "#000"
+    bg: "#000",
+    padding: {
+      right: 5,
+      bottom: 5,
+      left: 5,
+      top: 5
+    }
   };
 
   this.data = {};
@@ -28,8 +34,8 @@ ASCISIM.Display.prototype.compute = function () {
   this.spacing.x = Math.ceil(this.options.spacing * cw);
   this.spacing.y = Math.ceil(this.options.spacing * this.options.fontSize);
 
-  this.context.canvas.width = this.options.width * this.spacing.x;
-  this.context.canvas.height = this.options.height * this.spacing.y;
+  this.context.canvas.width = this.options.width * this.spacing.x + this.options.padding.right + this.options.padding.left;
+  this.context.canvas.height = this.options.height * this.spacing.y + this.options.padding.bottom + this.options.padding.top;
 };
 
 ASCISIM.Display.prototype.setOptions = function (options) {
@@ -91,15 +97,15 @@ ASCISIM.Display.prototype.border = function (x, y, w, h, fg, bg) {
   // top border
   this.char(x, y, "\u250f", fg, bg);
   this.horizontal(x + 1, y, w - 2, "\u2501", fg, bg);
-  this.char(x + w - 2, y, "\u2513", fg, bg);
+  this.char(x + w - 1, y, "\u2513", fg, bg);
   // left border
   this.vertical(x, y + 1, h - 1, "\u2503", fg, bg);
   // right border
-  this.vertical(x + w - 2, y + 1, h - 1, "\u2503", fg, bg);
+  this.vertical(x + w - 1, y + 1, h - 1, "\u2503", fg, bg);
   // bottom border
   this.char(x, y + h - 1, "\u2517", fg, bg);
   this.horizontal(x + 1, y + h - 1, w - 2, "\u2501", fg, bg);
-  this.char(x + w - 2, y + h - 1, "\u251b", fg, bg);
+  this.char(x + w - 1, y + h - 1, "\u251b", fg, bg);
 };
 
 ASCISIM.Display.prototype.text = function (x, y, text, fg, bg) {
@@ -124,10 +130,10 @@ ASCISIM.Display.prototype.render = function () {
 
     if (bg !== this.options.bg) {
       this.context.fillStyle = bg;
-      this.context.fillRect(x * this.spacing.x, y * this.spacing.y, this.spacing.x, this.spacing.y);
+      this.context.fillRect(this.options.padding.left + x * this.spacing.x, this.options.padding.top + y * this.spacing.y, this.spacing.x, this.spacing.y);
     }
 
     this.context.fillStyle = fg;
-    this.context.fillText(ch, (x + 0.5) * this.spacing.x, Math.ceil((y + 0.5) * this.spacing.y));
+    this.context.fillText(ch, this.options.padding.left + (x + 0.5) * this.spacing.x, this.options.padding.top + Math.ceil((y + 0.5) * this.spacing.y));
   }
 };

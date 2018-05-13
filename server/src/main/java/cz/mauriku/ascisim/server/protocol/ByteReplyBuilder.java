@@ -12,7 +12,7 @@ public class ByteReplyBuilder {
   private ByteBuffer buffer;
 
   public ByteReplyBuilder begin(int size) {
-    buffer = ByteBuffer.allocate(64);
+    buffer = ByteBuffer.allocate(size);
     return this;
   }
 
@@ -38,6 +38,20 @@ public class ByteReplyBuilder {
 
   public ByteReplyBuilder add(boolean value) {
     buffer.put(value? (byte) 1 : (byte) 0);
+    return this;
+  }
+
+  public ByteReplyBuilder add(double value) {
+    buffer.putDouble(value);
+    return this;
+  }
+
+  public ByteReplyBuilder add(String str) {
+    buffer.putInt(str.length());
+    byte[] arr = str.getBytes();
+    for (byte bt : arr)
+      buffer.put(bt);
+
     return this;
   }
 

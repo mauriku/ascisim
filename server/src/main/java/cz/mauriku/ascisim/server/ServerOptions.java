@@ -11,7 +11,7 @@ public class ServerOptions {
 
   private static final Logger LOG = LoggerFactory.getLogger(ServerOptions.class);
 
-  public final int DEFAULT_PORT = 7077;
+  public final int DEFAULT_PORT = 7070;
   public final String DEFAULT_DATA_DIR = Paths.get("./data").toAbsolutePath().toString();
 
   private Integer port;

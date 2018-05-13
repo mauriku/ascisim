@@ -1,6 +1,8 @@
 package cz.mauriku.ascisim.server.objects;
 
 import cz.mauriku.ascisim.server.objects.client.PlayerAccount;
+import cz.mauriku.ascisim.server.services.MetaObjectService;
+import org.apache.ignite.internal.util.typedef.PAX;
 
 import java.time.Instant;
 import java.util.*;
@@ -8,13 +10,13 @@ import java.util.*;
 public class PaxImpMetaObject {
   
   private String id;
-  private Instant createdDate;
   private PaxImpObjectType type;
   private Map<String, Object> property;
   private Map<String, String> actionCode;
   private String authorAccountId;
-  private transient List<PaxImpMetaObjectLog> log;
+  private boolean unique;
 
+  private transient List<PaxImpMetaObjectLog> log;
   private transient PlayerAccount authorAccount;
 
   public PaxImpMetaObject() {
@@ -22,9 +24,19 @@ public class PaxImpMetaObject {
     property = new HashMap<>();
     actionCode = new HashMap<>();
     log = new ArrayList<>();
+    unique = false;
   }
 
-  public PaxImpObject createNewObject() {
+  public <T extends PaxImpObject> T createNewObject(Class<T> typeOf) {
+    switch (type) {
+      case CHARACTER:
+        return typeOf.cast(new PaxImpCharacter(this));
+      case SECTOR:
+      case LOCATION:
+      case CORPUSCULE:
+      case UNIVERSE:
+        return typeOf.cast(new PaxImpObject(this));
+    }
     return null;
   }
 
@@ -52,14 +64,6 @@ public class PaxImpMetaObject {
 
   public void setId(String id) {
     this.id = id;
-  }
-
-  public Instant getCreatedDate() {
-    return createdDate;
-  }
-
-  public void setCreatedDate(Instant createdDate) {
-    this.createdDate = createdDate;
   }
 
   public PaxImpObjectType getType() {
@@ -101,5 +105,17 @@ public class PaxImpMetaObject {
   public void setAuthorAccount(PlayerAccount authorAccount) {
     this.authorAccount = authorAccount;
     this.authorAccountId = authorAccount.getId();
+  }
+
+  public void setAuthorAccountId(String authorAccountId) {
+    this.authorAccountId = authorAccountId;
+  }
+
+  public boolean isUnique() {
+    return unique;
+  }
+
+  public void setUnique(boolean unique) {
+    this.unique = unique;
   }
 }

@@ -6,8 +6,10 @@ ASCISIM.TextConsole = function (game, options) {
     y: 0,
     w: 80,
     h: 25,
-    fg: "#ccc",
-    bg: "#000",
+    frameFg: "#bbb",
+    frameBg: "#000",
+    textFg: "#aaa",
+    textBg: "#000",
     title: "console"
   };
 
@@ -48,10 +50,10 @@ ASCISIM.TextConsole.prototype.draw = function () {
   this.game.display.clear({x: x, y: y, w: w, h: h});
 
   // render text
-  // TODO: truncate too lengthy text
-  var maxLines = Math.min(this.lines.length, h - 3);
+  // TODO: break too lengthy text
+  var maxLines = Math.min(this.lines.length, h - 4);
   for (var i = 0; i < maxLines; i++)
-    this.game.display.text(x + 1, y + h - i - 3, this.lines[this.lines.length - i - 1]);
+    this.game.display.text(x + 1, y + h - i - 3, this.lines[this.lines.length - i - 1], this.options.textFg, this.options.textBg);
 
   if (this.mode === this.MODES.NORMAL)
     this.game.display.text(x + 1, y + h - 2, ">" + this.input + "_");
@@ -59,8 +61,8 @@ ASCISIM.TextConsole.prototype.draw = function () {
     this.game.display.text(x + 1, y + h - 2, ">" + ASCISIM.GENERATORS.homogeneousText('*', this.input.length) + "_");
 
 
-  this.game.display.border(x, y, w, h);
-  this.game.display.text(x + 3, y, "\u252b" + this.options.title + "\u2523");
+  this.game.display.border(x, y, w, h, this.options.frameFg, this.options.frameBg);
+  this.game.display.text(x + 3, y, "\u252b" + this.options.title + "\u2523", this.options.frameFg, this.options.frameBg);
 };
 
 ASCISIM.TextConsole.prototype.onKeyPress = function(event, char) {

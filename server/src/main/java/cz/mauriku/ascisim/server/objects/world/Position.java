@@ -1,15 +1,19 @@
 package cz.mauriku.ascisim.server.objects.world;
 
-public class GridPosition {
-  long x;
-  long y;
+public class Position {
+  private long x;
+  private long y;
 
-  public GridPosition() {
+  public Position() {
   }
 
-  public GridPosition(long x, long y) {
+  public Position(long x, long y) {
     this.x = x;
     this.y = y;
+  }
+
+  public static Position of(long x, long y) {
+    return new Position(x, y);
   }
 
   public long getX() {
@@ -33,7 +37,7 @@ public class GridPosition {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    GridPosition that = (GridPosition) o;
+    Position that = (Position) o;
 
     if (getX() != that.getX()) return false;
     return getY() == that.getY();

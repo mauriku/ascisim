@@ -4,11 +4,20 @@ public class PaxImpProperty<T> {
   String name;
   Class<T> type;
   boolean readOnly;
+  boolean persistent;
 
   public PaxImpProperty(String name, boolean readOnly, Class<T> type) {
     this.name = name;
     this.type = type;
-    this.readOnly = true;
+    this.readOnly = readOnly;
+    this.persistent = true;
+  }
+
+  public PaxImpProperty(String name, Class<T> type, boolean readOnly, boolean persistent) {
+    this.name = name;
+    this.type = type;
+    this.readOnly = readOnly;
+    this.persistent = persistent;
   }
 
   public String getName() {
