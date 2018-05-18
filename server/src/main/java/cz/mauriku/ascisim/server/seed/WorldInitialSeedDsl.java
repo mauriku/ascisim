@@ -164,6 +164,14 @@ public class WorldInitialSeedDsl {
     return new ArgumentFragment.Position(x, y);
   }
 
+  protected String idOf(PaxImpObject object) {
+    return object.getId();
+  }
+
+  protected String idOf(PaxImpMetaObject metaObject) {
+    return metaObject.getId();
+  }
+
   private <T, U> ArgumentFragment<T, U> requireOne(Class<? extends ArgumentFragment<T, U>> cls, ArgumentFragment[] args) {
     for (ArgumentFragment arg : args)
       if (arg.getClass().isAssignableFrom(cls))

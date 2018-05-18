@@ -86,7 +86,7 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
     );
 
     SUBZERO = object(
-        property(UNIVERSE_ID, THE_UNIVERSUM.getId()),
+        property(UNIVERSE_ID, idOf(THE_UNIVERSUM)),
 
         position(0, 0),
 
@@ -94,8 +94,8 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
     );
 
     THE_CORE = object(
-        property(UNIVERSE_ID, THE_UNIVERSUM.getId()),
-        property(SECTOR_ID, SUBZERO.getId()),
+        property(UNIVERSE_ID, idOf(THE_UNIVERSUM)),
+        property(SECTOR_ID, idOf(SUBZERO)),
 
         position(0, 0),
 
@@ -103,8 +103,8 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
     );
 
     ARX = object(
-        property(UNIVERSE_ID, THE_UNIVERSUM.getId()),
-        property(SECTOR_ID, SUBZERO.getId()),
+        property(UNIVERSE_ID, idOf(THE_UNIVERSUM)),
+        property(SECTOR_ID, idOf(SUBZERO)),
 
         position(1, 1),
 
@@ -112,9 +112,9 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
     );
 
     GREAT_TEMPLUM = object(
-        property(UNIVERSE_ID, THE_UNIVERSUM.getId()),
-        property(SECTOR_ID, SUBZERO.getId()),
-        property(CORPUSCULE_ID, THE_CORE.getId()),
+        property(UNIVERSE_ID, idOf(THE_UNIVERSUM)),
+        property(SECTOR_ID, idOf(SUBZERO)),
+        property(CORPUSCULE_ID, idOf(THE_CORE)),
 
         position(0, 0),
 
@@ -130,10 +130,10 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
         level(1),
         adjustToLevel(),
 
-        property(UNIVERSE_ID, THE_UNIVERSUM.getId()),
-        property(SECTOR_ID, SUBZERO.getId()),
-        property(CORPUSCULE_ID, THE_CORE.getId()),
-        property(LOCATION_ID, GREAT_TEMPLUM.getId()),
+        property(UNIVERSE_ID, idOf(THE_UNIVERSUM)),
+        property(SECTOR_ID, idOf(SUBZERO)),
+        property(CORPUSCULE_ID, idOf(THE_CORE)),
+        property(LOCATION_ID, idOf(GREAT_TEMPLUM)),
 
         position(0,0),
 
@@ -146,10 +146,10 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
         level(1),
         adjustToLevel(),
 
-        property(UNIVERSE_ID, THE_UNIVERSUM.getId()),
-        property(SECTOR_ID, SUBZERO.getId()),
-        property(CORPUSCULE_ID, THE_CORE.getId()),
-        property(LOCATION_ID, GREAT_TEMPLUM.getId()),
+        property(UNIVERSE_ID, idOf(THE_UNIVERSUM)),
+        property(SECTOR_ID, idOf(SUBZERO)),
+        property(CORPUSCULE_ID, idOf(THE_CORE)),
+        property(LOCATION_ID, idOf(GREAT_TEMPLUM)),
 
         position(0,0),
 
