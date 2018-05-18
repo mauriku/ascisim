@@ -1,14 +1,16 @@
 package cz.mauriku.ascisim.server.objects;
 
 import cz.mauriku.ascisim.server.objects.client.PlayerAccount;
+import cz.mauriku.ascisim.server.services.CharacterService;
 import cz.mauriku.ascisim.server.services.MetaObjectService;
+import cz.mauriku.ascisim.server.services.ObjectService;
 import org.apache.ignite.internal.util.typedef.PAX;
 
 import java.time.Instant;
 import java.util.*;
 
 public class PaxImpMetaObject {
-  
+
   private String id;
   private PaxImpObjectType type;
   private Map<String, Object> property;
@@ -27,17 +29,24 @@ public class PaxImpMetaObject {
     unique = false;
   }
 
-  public <T extends PaxImpObject> T createNewObject(Class<T> typeOf) {
-    switch (type) {
-      case CHARACTER:
-        return typeOf.cast(new PaxImpCharacter(this));
-      case SECTOR:
-      case LOCATION:
-      case CORPUSCULE:
-      case UNIVERSE:
-        return typeOf.cast(new PaxImpObject(this));
-    }
-    return null;
+  public PaxImpCharacter createNewObject(CharacterService service) {
+    if (type != PaxImpObjectType.CHARACTER)
+      throw new IllegalStateException("Cannot create character from non-character meta.");
+
+    if (unique && service.findByMeta(id).size() != 0)
+      throw new IllegalStateException("Cannot create character, unique constraint violated.");
+
+    return new PaxImpCharacter(this);
+  }
+
+  public PaxImpObject createNewObject(ObjectService service) {
+    if (type == PaxImpObjectType.CHARACTER)
+      throw new IllegalStateException("Cannot create object from non-object meta.");
+
+    if (unique && service.findByMeta(id).size() != 0)
+      throw new IllegalStateException("Cannot create object, unique constraint violated.");
+
+    return new PaxImpObject(this);
   }
 
   public <T> T getMetaObjectProperty(PaxImpProperty<T> property) {

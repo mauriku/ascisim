@@ -1,6 +1,10 @@
 package cz.mauriku.ascisim.server.objects.client;
 
+import cz.mauriku.ascisim.server.objects.PaxImpCharacter;
+
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerAccount {
 
@@ -12,6 +16,19 @@ public class PlayerAccount {
   private Instant lastLoginDate;
   private String authenticationToken;
   private PlayerAccountLevel level;
+  private List<String> characterIds;
+
+  public PlayerAccount() {
+    characterIds = new ArrayList<>();
+  }
+
+  public List<String> getCharacterIds() {
+    return characterIds;
+  }
+
+  public void setCharacterIds(List<String> characterIds) {
+    this.characterIds = characterIds;
+  }
 
   public String getId() {
     return getEmail();

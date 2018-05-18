@@ -60,13 +60,8 @@ public class ClientLoginHandler implements MessageHandler {
         }
       }
 
-      ByteReplyBuilder reply = new ByteReplyBuilder()
-          .begin(256)
-          .add(ControlByte.LOGIN)
-          .add(authenticated) // client is authenticated
-          .add(authenticated ? acc.getAuthenticationToken() : "NA");
-
-      channel.writeAndFlush(reply.build());
+      channel.writeAndFlush(ByteReplyBuilder.buildLoginReplyMessage(authenticated,
+          authenticated ? acc.getAuthenticationToken() : "NA"));
 
     } catch (UnsupportedEncodingException e) {
       LOG.error("Cannot decode client message.", e);

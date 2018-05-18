@@ -3,8 +3,8 @@ package cz.mauriku.ascisim.server;
 import cz.mauriku.ascisim.server.protocol.PaxImpProtocolHandler;
 import cz.mauriku.ascisim.server.protocol.handshake.ClientHandshakeHandler;
 import cz.mauriku.ascisim.server.protocol.handshake.ClientLoginHandler;
-import cz.mauriku.ascisim.server.services.MetaObjectService;
-import cz.mauriku.ascisim.server.services.PlayerAccountService;
+import cz.mauriku.ascisim.server.seed.WorldInitialSeed;
+import cz.mauriku.ascisim.server.services.*;
 
 public class PaxImpServerMain {
 
@@ -17,13 +17,18 @@ public class PaxImpServerMain {
 
     PlayerAccountService playerAccountService = new PlayerAccountService(server.getIgnite());
     MetaObjectService metaObjectService = new MetaObjectService(server.getIgnite());
+    CharacterService characterService = new CharacterService(server.getIgnite());
+    ObjectService objectService = new ObjectService(server.getIgnite());
+    PositioningService positioningService = new PositioningService(server.getIgnite());
 
     WorldInitialSeed worldSeed = new WorldInitialSeed(
         playerAccountService,
-        metaObjectService
+        metaObjectService,
+        characterService,
+        objectService,
+        positioningService
     );
-
-    //worldSeed.initWorld();
+    worldSeed.initializeWorld();
 
     server.initWebSocketServer(
         new PaxImpProtocolHandler(

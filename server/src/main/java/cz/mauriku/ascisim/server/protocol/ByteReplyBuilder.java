@@ -59,4 +59,25 @@ public class ByteReplyBuilder {
     ByteBuf buf = Unpooled.wrappedBuffer(buffer.array());
     return new BinaryWebSocketFrame(buf);
   }
+
+  public static BinaryWebSocketFrame buildLoginReplyMessage(boolean authenticated, String token) {
+    ByteReplyBuilder reply = new ByteReplyBuilder()
+        .begin(256)
+        .add(ControlByte.LOGIN)
+        .add(authenticated)
+        .add(token);
+
+    return reply.build();
+  }
+
+  public static BinaryWebSocketFrame buildHandshakeReplyMessage(boolean open, int width, int height, int fontSize) {
+    ByteReplyBuilder reply = new ByteReplyBuilder()
+        .begin(64)
+        .add(ControlByte.HANDSHAKE)
+        .add(open) // server is open for client connections
+        .add(width)  // screen width
+        .add(height)   // screen height
+        .add(fontSize);  // font size
+    return reply.build();
+  }
 }
