@@ -6,6 +6,7 @@ var ASCISIM = {
 ASCISIM.PLAYER = {};
 
 ASCISIM.PLAYER.properties = {
+  char: '@',
   hpCur: 0,
   hpMax: 999,
   epCur: 0,

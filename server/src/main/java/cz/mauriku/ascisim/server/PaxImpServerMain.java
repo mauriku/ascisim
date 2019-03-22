@@ -17,8 +17,8 @@ public class PaxImpServerMain {
 
     PlayerAccountService playerAccountService = new PlayerAccountService(server.getIgnite());
     MetaObjectService metaObjectService = new MetaObjectService(server.getIgnite());
-    CharacterService characterService = new CharacterService(server.getIgnite());
-    ObjectService objectService = new ObjectService(server.getIgnite());
+    CharacterService characterService = new CharacterService(server.getIgnite(), metaObjectService);
+    ObjectService objectService = new ObjectService(server.getIgnite(), metaObjectService);
     PositioningService positioningService = new PositioningService(server.getIgnite());
 
     WorldInitialSeed worldSeed = new WorldInitialSeed(
@@ -33,7 +33,12 @@ public class PaxImpServerMain {
     server.initWebSocketServer(
         new PaxImpProtocolHandler(
             new ClientHandshakeHandler(),
-            new ClientLoginHandler(playerAccountService)
+            new ClientLoginHandler(
+                playerAccountService,
+                characterService,
+                positioningService,
+                objectService
+            )
         )
     );
   }

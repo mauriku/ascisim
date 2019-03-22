@@ -1,5 +1,10 @@
 package cz.mauriku.ascisim.server.protocol;
 
+import cz.mauriku.ascisim.server.objects.PaxImpCharacter;
+import cz.mauriku.ascisim.server.objects.PaxImpObject;
+import cz.mauriku.ascisim.server.objects.PaxImpPositioning;
+import cz.mauriku.ascisim.server.services.ObjectService;
+import cz.mauriku.ascisim.server.services.PositioningService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
@@ -37,7 +42,7 @@ public class ByteReplyBuilder {
   }
 
   public ByteReplyBuilder add(boolean value) {
-    buffer.put(value? (byte) 1 : (byte) 0);
+    buffer.put(value ? (byte) 1 : (byte) 0);
     return this;
   }
 
@@ -47,8 +52,8 @@ public class ByteReplyBuilder {
   }
 
   public ByteReplyBuilder add(String str) {
-    buffer.putInt(str.length());
     byte[] arr = str.getBytes();
+    buffer.putInt(arr.length);
     for (byte bt : arr)
       buffer.put(bt);
 
@@ -74,10 +79,54 @@ public class ByteReplyBuilder {
     ByteReplyBuilder reply = new ByteReplyBuilder()
         .begin(64)
         .add(ControlByte.HANDSHAKE)
-        .add(open) // server is open for client connections
-        .add(width)  // screen width
-        .add(height)   // screen height
-        .add(fontSize);  // font size
+        .add(open)        // server is open for client connections
+        .add(width)       // screen width
+        .add(height)      // screen height
+        .add(fontSize);   // font size
+    return reply.build();
+  }
+
+  public static BinaryWebSocketFrame buildCharacterUpdateMessage(
+      CharacterUpdateByte charByte,
+      PaxImpCharacter character,
+      PositioningService positioningService,
+      ObjectService objectService
+  ) {
+    ByteReplyBuilder reply = new ByteReplyBuilder()
+        .begin(512)
+        .add(ControlByte.CHARACTER_UPDATE)
+        .add(charByte.opcode);
+
+    PaxImpPositioning pos = null;
+    PaxImpObject location = null;
+
+    if (charByte == CharacterUpdateByte.UI || charByte == CharacterUpdateByte.POSITION) {
+      pos = positioningService.getPosition(character.getId());
+      location = objectService.findById(character.getLocationId());
+    }
+
+    switch (charByte) {
+      case UI:
+        reply.add("" + character.getObjectProperty(PaxImpObject.CHAR)); // character visualization
+        reply.add(character.getName());                                 // character name
+        reply.add((int) pos.getPoint().getX());                         // position x
+        reply.add((int) pos.getPoint().getY());                         // position y
+        reply.add(location.getName());                                  // location name
+        reply.add(character.getCurrentHitPoints());                     // current hp
+        reply.add(character.getMaximumHitPoints());                     // maximum hp
+        reply.add(character.getCurrentEnergyPoints());                  // current energy points
+        reply.add(character.getMaximumEnergyPoints());                  // maximum energy points
+        reply.add(character.getLevel());                                // level
+        reply.add(character.getCurrentXp());                            // current xp
+        reply.add(character.getAdvanceXp());                            // advance xp
+        break;
+
+      case POSITION:
+        reply.add((int) pos.getPoint().getX());
+        reply.add((int) pos.getPoint().getY());
+        break;
+    }
+
     return reply.build();
   }
 }

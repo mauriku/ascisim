@@ -50,6 +50,14 @@ public class PaxImpObject {
     this.properties.put(property.getName(), value);
   }
 
+  public String getName() {
+    return getObjectProperty(PaxImpObject.NAME);
+  }
+
+  public String getLocationId() {
+    return getObjectProperty(PaxImpObject.LOCATION_ID);
+  }
+
   public String getId() {
     return id;
   }

@@ -127,4 +127,11 @@ public class ArgumentFragment<T, U> {
       super(value1, value2);
     }
   }
+
+  public static class MarkCharacterActive extends ArgumentFragment<Boolean, Void> {
+
+    public MarkCharacterActive(Boolean value) {
+      super(value);
+    }
+  }
 }

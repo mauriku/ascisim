@@ -1,11 +1,7 @@
 ASCISIM.ResponseHandler = function () {
 };
+
 ASCISIM.ResponseHandler.prototype.handle = function (game, data) {
-};
-ASCISIM.ResponseHandler.prototype.getTextFromData = function (start, data) {
-  var length = data.getInt32(start);
-  var bytes = new Uint8Array(data.buffer, start + 4, length);
-  return new TextDecoder().decode(bytes);
 };
 
 
@@ -14,10 +10,12 @@ ASCISIM.HandshakeResponseHandler = function () {
 };
 ASCISIM.HandshakeResponseHandler.prototype = Object.create(ASCISIM.ResponseHandler.prototype);
 ASCISIM.HandshakeResponseHandler.prototype.handle = function (game, data) {
-  var open = data.getInt8(1);
-  var width = data.getInt32(2);
-  var height = data.getInt32(6);
-  var fontSize = data.getInt32(10);
+  var reader = new ASCISIM.DataReader(data, 1);
+
+  var open = reader.getByte();
+  var width = reader.getInteger();
+  var height = reader.getInteger();
+  var fontSize = reader.getInteger();
 
   if (open === 1) {
     game.console.line("# Received initial configuration.");
@@ -33,7 +31,7 @@ ASCISIM.HandshakeResponseHandler.prototype.handle = function (game, data) {
           return item.indexOf('paxtoken=') >= 0
         }).length) {
       game.display.clear();
-      token = document.cookie.split("=")[1];
+      var token = document.cookie.split("=")[1];
       game.sendBinary(0x02, 'T' + token);
       game.setFocus(game.screens['login']);
       game.focused.username = token.split("/")[0];
@@ -52,8 +50,10 @@ ASCISIM.LoginResponseHandler = function () {
 };
 ASCISIM.LoginResponseHandler.prototype = Object.create(ASCISIM.ResponseHandler.prototype);
 ASCISIM.LoginResponseHandler.prototype.handle = function (game, data) {
-  var authenticated = data.getInt8(1);
-  var token = this.getTextFromData(2, data);
+  var reader = new ASCISIM.DataReader(data, 1);
+
+  var authenticated = reader.getByte();
+  var token = reader.getString();
 
   if (authenticated === 1) {
     document.cookie = "paxtoken=" + game.focused.username + "/" + token;
@@ -65,4 +65,38 @@ ASCISIM.LoginResponseHandler.prototype.handle = function (game, data) {
     game.console.line("# Unsuccessful login. Try again.");
     game.focused.tryAgain();
   }
+};
+
+ASCISIM.CharacterUpdateHandler = function () {
+  ASCISIM.ResponseHandler.call(this);
+};
+ASCISIM.CharacterUpdateHandler.prototype = Object.create(ASCISIM.ResponseHandler.prototype);
+ASCISIM.CharacterUpdateHandler.prototype.handle = function (game, data) {
+
+  ASCISIM.PLAYER.properties.char = this.getTextFromData(1, data);
+};
+
+
+ASCISIM.DataReader = function(data, initialOffset) {
+  this.data = data;
+  this.offset = initialOffset;
+};
+
+ASCISIM.DataReader.prototype.getString = function () {
+  var length = this.getInteger();
+  var bytes = new Uint8Array(this.data.buffer, this.offset, length);
+  this.offset += length;
+  return new TextDecoder().decode(bytes);
+};
+
+ASCISIM.DataReader.prototype.getInteger = function () {
+  var int = this.data.getInt32(this.offset);
+  this.offset += 4;
+  return int;
+};
+
+ASCISIM.DataReader.prototype.getByte = function () {
+  var byte = this.data.getInt8(this.offset);
+  this.offset += 1;
+  return byte;
 };

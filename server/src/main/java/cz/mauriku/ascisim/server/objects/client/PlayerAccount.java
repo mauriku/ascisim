@@ -17,6 +17,7 @@ public class PlayerAccount {
   private String authenticationToken;
   private PlayerAccountLevel level;
   private List<String> characterIds;
+  private String activeCharacterId;
 
   public PlayerAccount() {
     characterIds = new ArrayList<>();
@@ -96,5 +97,13 @@ public class PlayerAccount {
 
   public void setAuthenticationToken(String authenticationToken) {
     this.authenticationToken = authenticationToken;
+  }
+
+  public String getActiveCharacterId() {
+    return activeCharacterId;
+  }
+
+  public void setActiveCharacterId(String activeCharacterId) {
+    this.activeCharacterId = activeCharacterId;
   }
 }

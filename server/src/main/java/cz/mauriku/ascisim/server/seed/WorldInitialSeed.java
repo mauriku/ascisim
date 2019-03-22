@@ -69,10 +69,19 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
         unique()
     );
 
-    COMMON_CHARACTER_META = meta(
+    HUMAN_META = meta(
         author(ACC_PES),
         type(CHARACTER),
-        name("Common character"),
+        name("Common Human Character"),
+
+        property(CHAR, '@'),
+        property(MAX_LEVEL, 99)
+    );
+
+    ANGEL_META = meta(
+        author(ACC_PES),
+        type(CHARACTER),
+        name("Common Angel Character"),
 
         property(CHAR, '@'),
         property(MAX_LEVEL, 99)
@@ -129,6 +138,7 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
         name("Mauriku"),
         level(1),
         adjustToLevel(),
+        active(),
 
         property(UNIVERSE_ID, idOf(THE_UNIVERSUM)),
         property(SECTOR_ID, idOf(SUBZERO)),
@@ -137,7 +147,7 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
 
         position(0,0),
 
-        template(COMMON_CHARACTER_META)
+        template(HUMAN_META)
     );
 
     BARACHIEL = character(
@@ -145,6 +155,7 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
         name("Barachiel"),
         level(1),
         adjustToLevel(),
+        active(),
 
         property(UNIVERSE_ID, idOf(THE_UNIVERSUM)),
         property(SECTOR_ID, idOf(SUBZERO)),
@@ -153,7 +164,7 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
 
         position(0,0),
 
-        template(COMMON_CHARACTER_META)
+        template(ANGEL_META)
     );
   }
 
@@ -175,7 +186,9 @@ public class WorldInitialSeed extends WorldInitialSeedDsl {
   private PaxImpMetaObject THE_CORE_META;
   private PaxImpMetaObject ARX_META;
   private PaxImpMetaObject GREAT_TEMPLUM_META;
-  private PaxImpMetaObject COMMON_CHARACTER_META;
+
+  private PaxImpMetaObject HUMAN_META;
+  private PaxImpMetaObject ANGEL_META;
 
   private PaxImpCharacter MAURIKU;
   private PaxImpCharacter BARACHIEL;

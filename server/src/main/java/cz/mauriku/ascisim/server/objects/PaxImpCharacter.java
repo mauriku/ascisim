@@ -1,17 +1,22 @@
 package cz.mauriku.ascisim.server.objects;
 
+import cz.mauriku.ascisim.server.objects.abilities.LogisticAbilityModel;
+import cz.mauriku.ascisim.server.objects.abilities.PaxImpAbilityModel;
+
 public class PaxImpCharacter extends PaxImpObject {
 
   public static final PaxImpProperty<Integer> CURRENT_HP = new PaxImpProperty<>("currentHp", false, Integer.class);
   public static final PaxImpProperty<Integer> CURRENT_EP = new PaxImpProperty<>("currentEp", false, Integer.class);
   public static final PaxImpProperty<Integer> MAXIMUM_HP = new PaxImpProperty<>("maximumHp", false, Integer.class);
   public static final PaxImpProperty<Integer> MAXIMUM_EP = new PaxImpProperty<>("maximumEp", false, Integer.class);
-
-  public static final PaxImpProperty<Integer> STRENGTH = new PaxImpProperty<Integer>("strength", false, Integer.class);
-  public static final PaxImpProperty<Integer> DEXTERITY = new PaxImpProperty<Integer>("dexterity", false, Integer.class);
-  public static final PaxImpProperty<Integer> CONSTITUTION = new PaxImpProperty<Integer>("constitution", false, Integer.class);
-  public static final PaxImpProperty<Integer> INTELLIGENCE = new PaxImpProperty<Integer>("intelligence", false, Integer.class);
+  
   public static final PaxImpProperty<Integer> MAX_LEVEL = new PaxImpProperty<>("maxLevel", true, Integer.class);
+
+  public static final PaxImpProperty<Integer> CURRENT_XP = new PaxImpProperty<Integer>("currentXp", false, Integer.class);
+  public static final PaxImpProperty<Integer> ADVANCE_XP = new PaxImpProperty<Integer>("advanceXp", false, Integer.class);
+
+  private final PaxImpAbilityModel hpModel = new LogisticAbilityModel(8, 800, 60, -0.1f);
+  private final PaxImpAbilityModel epModel = new LogisticAbilityModel(-5, 800, 60, -0.08f);
 
   public PaxImpCharacter() {
     super();
@@ -49,15 +54,16 @@ public class PaxImpCharacter extends PaxImpObject {
     setLevel(level, false);
   }
   
-  public void setLevel(int level, boolean modifyCharAbilities) {
+  public void setLevel(int level, boolean adjustToLevel) {
     if (level < 1 || level > getObjectProperty(MAX_LEVEL))
       throw new IllegalArgumentException("Character level out of bound <1," + getObjectProperty(MAX_LEVEL) + ">.");
 
     setObjectProperty(PaxImpObject.LEVEL, level);
 
-    if (modifyCharAbilities) {
-      //setMaximumHitPoints(hpModel.getAbilityValue(level));
-      //setMaximumEnergyPoints(epModel.getAbilityValue(level));
+    if (adjustToLevel) {
+      setMaximumHitPoints(hpModel.valueForLevel(level));
+      setMaximumEnergyPoints(epModel.valueForLevel(level));
+      adjustHpEpToMaximum();
     }
   }
 
@@ -65,43 +71,17 @@ public class PaxImpCharacter extends PaxImpObject {
     return getObjectProperty(PaxImpObject.LEVEL);
   }
 
-  public void setStrength(int strength) {
-    setAbility(STRENGTH, strength);
+  public int getCurrentXp() {
+    return getObjectProperty(CURRENT_XP);
   }
 
-  public int getStrength() {
-    return getObjectProperty(STRENGTH);
+  public int getAdvanceXp() {
+    return getObjectProperty(ADVANCE_XP);
   }
 
-  public void setDexterity(int dexterity) {
-    setAbility(DEXTERITY, dexterity);
-  }
-
-  public int getDexterity() {
-    return getObjectProperty(DEXTERITY);
-  }
-
-  public void setConstitution(int constitution) {
-    setAbility(CONSTITUTION, constitution);
-  }
-
-  public int getIntelligence() {
-    return getObjectProperty(INTELLIGENCE);
-  }
-
-  public void setIntelligence(int constitution) {
-    setAbility(INTELLIGENCE, constitution);
-  }
-
-  public int getConstitution() {
-    return getObjectProperty(CONSTITUTION);
-  }
-
-  private void setAbility(PaxImpProperty<Integer> ability, int value) {
-    if (value < 1 || value > 99)
-      throw new IllegalArgumentException("Character " + ability.getName() + " out of bound <1,99>.");
-
-    setObjectProperty(ability, value);
+  public void adjustHpEpToMaximum() {
+    setObjectProperty(CURRENT_HP, getMaximumHitPoints());
+    setObjectProperty(CURRENT_EP, getMaximumEnergyPoints());
   }
 
 }

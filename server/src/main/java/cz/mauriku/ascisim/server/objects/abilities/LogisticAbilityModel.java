@@ -15,7 +15,7 @@ public class LogisticAbilityModel implements PaxImpAbilityModel {
   }
 
   @Override
-  public int abilityValue(int level) {
+  public int valueForLevel(int level) {
     return Math.round(base + target * (1 / (1 + (float) Math.exp(-coeff * (level - midpoint)))));
   }
 }

@@ -1,12 +1,13 @@
 package cz.mauriku.ascisim.server.protocol.handshake;
 
 
+import cz.mauriku.ascisim.server.objects.PaxImpCharacter;
 import cz.mauriku.ascisim.server.objects.client.PlayerAccount;
-import cz.mauriku.ascisim.server.protocol.ByteReplyBuilder;
-import cz.mauriku.ascisim.server.protocol.ControlByte;
-import cz.mauriku.ascisim.server.protocol.MessageHandler;
-import cz.mauriku.ascisim.server.protocol.PaxImpProtocolHandler;
+import cz.mauriku.ascisim.server.protocol.*;
+import cz.mauriku.ascisim.server.services.CharacterService;
+import cz.mauriku.ascisim.server.services.ObjectService;
 import cz.mauriku.ascisim.server.services.PlayerAccountService;
+import cz.mauriku.ascisim.server.services.PositioningService;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import org.slf4j.Logger;
@@ -21,9 +22,16 @@ public class ClientLoginHandler implements MessageHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ClientLoginHandler.class);
 
   private final PlayerAccountService playerAccountService;
+  private final CharacterService characterService;
+  private final PositioningService positioningService;
+  private final ObjectService objectService;
 
-  public ClientLoginHandler(PlayerAccountService playerAccountService) {
+  public ClientLoginHandler(PlayerAccountService playerAccountService, CharacterService characterService,
+                            PositioningService positioningService, ObjectService objectService) {
     this.playerAccountService = playerAccountService;
+    this.characterService = characterService;
+    this.positioningService = positioningService;
+    this.objectService = objectService;
   }
 
   @Override
@@ -39,7 +47,7 @@ public class ClientLoginHandler implements MessageHandler {
       byte[] buffer = new byte[frame.content().readableBytes()];
       frame.content().readBytes(buffer, 0, frame.content().readableBytes());
       String content = new String(buffer, "UTF-8");
-      String method = content.substring(0,1);
+      String method = content.substring(0, 1);
       content = content.substring(1);
       String[] components = content.split("/");
 
@@ -62,6 +70,12 @@ public class ClientLoginHandler implements MessageHandler {
 
       channel.writeAndFlush(ByteReplyBuilder.buildLoginReplyMessage(authenticated,
           authenticated ? acc.getAuthenticationToken() : "NA"));
+
+      if (authenticated) {
+        PaxImpCharacter chr = characterService.findById(acc.getActiveCharacterId());
+        channel.writeAndFlush(ByteReplyBuilder.buildCharacterUpdateMessage(
+            CharacterUpdateByte.UI, chr, positioningService, objectService));
+      }
 
     } catch (UnsupportedEncodingException e) {
       LOG.error("Cannot decode client message.", e);

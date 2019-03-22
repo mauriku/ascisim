@@ -67,6 +67,7 @@ public class WorldInitialSeedDsl {
     List<? extends ArgumentFragment> properties = optionalMany(ArgumentFragment.Property.class, args);
     ArgumentFragment.Position position = (ArgumentFragment.Position)
         optionalOne(ArgumentFragment.Position.class, args);
+    boolean active = optionalOne(ArgumentFragment.MarkCharacterActive.class, false, args).getValue1();
 
     PaxImpCharacter character = metaObject.createNewObject(characterService);
     character.setLevel(level, adjustToLevel);
@@ -80,6 +81,8 @@ public class WorldInitialSeedDsl {
     characterService.storeNewCharacter(character);
 
     owner.getCharacterIds().add(character.getId());
+    if (active)
+      owner.setActiveCharacterId(character.getId());
     playerAccountService.updateAccount(owner);
 
     if (position != null)
@@ -164,6 +167,10 @@ public class WorldInitialSeedDsl {
     return new ArgumentFragment.Position(x, y);
   }
 
+  protected ArgumentFragment.MarkCharacterActive active() {
+    return new ArgumentFragment.MarkCharacterActive(true);
+  }
+
   protected String idOf(PaxImpObject object) {
     return object.getId();
   }
@@ -171,6 +178,7 @@ public class WorldInitialSeedDsl {
   protected String idOf(PaxImpMetaObject metaObject) {
     return metaObject.getId();
   }
+
 
   private <T, U> ArgumentFragment<T, U> requireOne(Class<? extends ArgumentFragment<T, U>> cls, ArgumentFragment[] args) {
     for (ArgumentFragment arg : args)

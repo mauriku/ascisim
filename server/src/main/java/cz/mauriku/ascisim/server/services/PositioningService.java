@@ -1,6 +1,5 @@
 package cz.mauriku.ascisim.server.services;
 
-import cz.mauriku.ascisim.server.objects.PaxImpCharacter;
 import cz.mauriku.ascisim.server.objects.PaxImpObject;
 import cz.mauriku.ascisim.server.objects.PaxImpPositioning;
 import org.apache.ignite.Ignite;
@@ -30,5 +29,13 @@ public class PositioningService {
     PaxImpPositioning pos = new PaxImpPositioning(object, x, y);
     positioningCache.putAsync(object.getId(), pos);
     return pos;
+  }
+
+  public PaxImpPositioning getPosition(PaxImpObject object) {
+    return getPosition(object.getId());
+  }
+
+  public PaxImpPositioning getPosition(String objectId) {
+     return positioningCache.get(objectId);
   }
 }

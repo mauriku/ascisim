@@ -92,6 +92,7 @@ public class PlayerAccountService {
   public PlayerAccount updateAccount(PlayerAccount account) {
     try (Transaction tx = ignite.transactions().txStart()) {
       cache.replace(account.getEmail(), account);
+      tx.commit();
       return account;
     }
   }
